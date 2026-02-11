@@ -741,13 +741,17 @@
     footer a:hover { color: var(--white); }
 
     /* ===== SCROLL FADE ===== */
+    .fade-up {
+      opacity: 1;
+      transform: none;
+    }
     @media (prefers-reduced-motion: no-preference) {
-      .fade-up {
+      html.js .fade-up {
         opacity: 0;
         transform: translateY(20px);
         transition: opacity 0.5s ease, transform 0.5s ease;
       }
-      .fade-up.visible {
+      html.js .fade-up.visible {
         opacity: 1;
         transform: translateY(0);
       }
@@ -1113,11 +1117,27 @@
     <p style="margin-top: 16px;">&copy; 2019–2026 AC/DC HVAC &amp; Appliance Repair, LLC. All rights reserved.</p>
   </footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    document.documentElement.classList.add('js');
     document.addEventListener('DOMContentLoaded', () => {
+      const items = document.querySelectorAll('.fade-up');
+      if (!items.length) return;
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion || !('IntersectionObserver' in window)) {
+        items.forEach((item) => item.classList.add('visible'));
+        return;
+      }
+
       const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+        entries.forEach((entry) => {
           if (entry.isIntersecting) entry.target.classList.add('visible');
         });
       }, { threshold: 0.1 });
-      document.qu
+
+      items.forEach((item) => observer.observe(item));
+    });
+  </script>
+</body>
+</html>
